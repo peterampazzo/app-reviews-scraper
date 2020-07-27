@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import json
 from google_play_scraper import Sort, reviews_all
@@ -19,7 +20,11 @@ with open('apps-list.json') as f:
     appsList = json.load(f)
 
 for selectedApp in appsList:
-    print("App: %s" % selectedApp)
+    print("App: %s" % selectedApp["id"])
+
+    appPath = "reviews/" + selectedApp["id"] + "/"
+    if not os.path.exists(appPath):
+        os.makedirs(appPath)
 
     for l in LANGUAGES:
 
@@ -35,6 +40,7 @@ for selectedApp in appsList:
             filter_score_with=None
         )
 
-        df = pd.DataFrame(result)
-        df.to_csv("reviews/%s/%s-%s.csv" %
-                  (selectedApp["id"], COUNTRY, l))
+        if result != []:
+            df = pd.DataFrame(result)
+            df.to_csv("reviews/%s/%s-%s.csv" %
+                      (selectedApp["id"], COUNTRY, l))
