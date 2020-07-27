@@ -1,0 +1,1 @@
+google-play-scraper==0.0.3.1
