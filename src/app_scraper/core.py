@@ -30,7 +30,7 @@ def app_store(apps_list: dict) -> None:
 def main(args):
     print(args.list)
     apps = load_apps(args.list)
-    init_project(apps.project)
+    init_project(apps["project"])
 
     if args.play_store:
         play_store(apps, args.details, args.reviews)

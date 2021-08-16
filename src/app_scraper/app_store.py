@@ -12,8 +12,8 @@ REVIEWS_COLUMNS = ['country', 'date', 'title',
 
 
 def app_store_reviews(project, app):
-    appPath = 'data/' + project + '/app-store/reviews/' + app['id'] + '/'
-    create_folder(appPath)
+    app_path = f"data/{project}/app-store/reviews/{app.id}/"
+    create_folders([app_path])
 
     for c in COUNTRIES:
         client = AppStore(
@@ -23,7 +23,7 @@ def app_store_reviews(project, app):
         if client.reviews_count != 0:
             df = pd.DataFrame(client.reviews, columns=REVIEWS_COLUMNS)
             df['country'] = c
-            df.to_csv(appPath + c + '.csv')
+            df.to_csv(app_path + c + '.csv')
 
         # time.sleep(30)
 

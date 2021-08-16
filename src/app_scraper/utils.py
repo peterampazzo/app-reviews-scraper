@@ -12,19 +12,19 @@ def create_folders(paths: list) -> None:
 
 def init_project(project):
     create_folders([
-         f"../data/{project}",
-         f"../data/{project}/app-store",
-         f"../data/{project}/play-store"
+         f"data/{project}",
+         f"data/{project}/app-store",
+         f"data/{project}/play-store"
          ])
 
     for f in FOLDERS:
         create_folders([
-            f"../data/{project}/app-store/{f}", 
-            f"../data/{project}/play-store/{f}"
+            f"data/{project}/app-store/{f}", 
+            f"data/{project}/play-store/{f}"
             ])
 
 def load_apps(filename: str) -> dict:
-    with open(f"../data/apps/{filename}.json") as f:
+    with open(f"data/apps/{filename}.json") as f:
         apps = json.load(f)
 
     return apps

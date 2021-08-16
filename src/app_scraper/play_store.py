@@ -36,7 +36,7 @@ def play_store_app(project, application):
 
 def play_store_reviews(project, app):
     path = f"data/{project}/play-store/reviews/{app}/"
-    create_folder(path)
+    create_folders([path])
     for lang in LANGUAGES:
         print(lang)
         result = reviews_all(
