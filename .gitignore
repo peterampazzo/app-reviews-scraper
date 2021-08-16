@@ -6,3 +6,10 @@ __pycache__/
 *.csv
 tmp/
 data/
+
+notebooks/
+
+env/
+dist/
+*.egg-info
+build/
