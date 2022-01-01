@@ -1,5 +1,4 @@
 import os
-import sys
 import argparse
 from pyhocon import ConfigFactory
 import pandas as pd
@@ -28,7 +27,7 @@ def run():
     parser.add_argument("--similar", action="store_true", help="Query similar")
     args = parser.parse_args()
 
-    if all([args.reviews, args.details, args.similar]):
+    if not any([args.reviews, args.details, args.similar]):
         # If none option are chosen, break.
         logging.error("None option.")
         return
@@ -54,8 +53,9 @@ def run():
         reviews=args.reviews,
     )
 
+    logging.info(f"Running {project} with {len(apps)} on Apple App Store.")
     for app, country in itertools.product(apps, APP_STORE_COUNTRIES):
-        logging.info(f"Running {app['id']} on country {country}.")
+        logging.info(f"Querying {app['name']} on country {country}.")
         client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
 
         if args.details:
@@ -63,20 +63,23 @@ def run():
             save_json(
                 f"{directories['details']}/{app['id']}/{country}.json", client.details
             )
+            logging.debug("Completed details.")
 
         if args.similar:
             client.get_similar()
             save_json(
                 f"{directories['similar']}/{app['id']}/{country}.json", client.similar
             )
+            logging.debug("Completed similar.")
 
         if args.reviews:
-            client.review(sleep=config.get("app.apple_store.sleep"))
+            client.review(sleep=config.get("app.sleep"))
             if client.reviews_count != 0:
                 df = pd.DataFrame(client.reviews, columns=APP_STORE_REVIEWS_COLUMNS)
                 df["country"] = country
                 df.to_csv(
                     os.path.join(directories["reviews"], app["id"], f"{country}.csv")
                 )
+                logging.debug("Completed reviews.")
 
-        time.sleep(config.get("app.apple_store.sleep"))
+        time.sleep(config.get("app.sleep"))

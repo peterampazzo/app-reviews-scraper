@@ -10,14 +10,14 @@ import logging
 
 def set_logging(config):
     logging.basicConfig(
-        level=logging.getLevelName(config.get("app.apple_store.logging_level")),
+        level=logging.getLevelName(config.get("app.logging_level")),
         format="[%(asctime)s] - %(levelname)s - %(name)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
         stream=sys.stdout,
     )
-    for logger in config.get("app.apple_store.logger"):
+    for logger in config.get("app.logger"):
         logging.getLogger(logger).setLevel(
-            logging.getLevelName(config.get("app.apple_store.logging_level_modules"))
+            logging.getLevelName(config.get("app.logging_level_modules"))
         )
 
 
@@ -27,15 +27,16 @@ def create_folder(path: str) -> None:
 
 
 def create_app_folders(
-    apps: list, directories: dict, details: bool, similar: bool, reviews: bool
+    apps: list, directories: dict, details: bool, similar: bool, reviews: bool, dashed: bool = False 
 ):
     for app in apps:
+        app_name = app['id'].replace(".", "-") if dashed else app['id']
         if details:
-            create_folder(f"{directories['details']}/{app['id']}")
+            create_folder(f"{directories['details']}/{app_name}")
         if similar:
-            create_folder(f"{directories['similar']}/{app['id']}")
+            create_folder(f"{directories['similar']}/{app_name}")
         if reviews:
-            create_folder(f"{directories['reviews']}/{app['id']}")
+            create_folder(f"{directories['reviews']}/{app_name}")
 
 
 def get_directories(root, store, project):
