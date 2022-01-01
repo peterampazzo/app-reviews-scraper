@@ -14,7 +14,7 @@ requests = "2.23.0"
 type = "git"
 url = "https://github.com/peterampazzo/app-store-scraper.git"
 reference = "master"
-resolved_reference = "942690834995278f953fa9ddf1d3d952b5c0ba5b"
+resolved_reference = "3e6729cc6429c2806bcde4f56ebd3d03d1bfe24d"
 
 [[package]]
 name = "beautifulsoup4"

@@ -7,8 +7,15 @@ import logging
 from pyhocon import ConfigFactory
 import google_play_scraper
 import play_scraper
-from app_scraper.utils import create_app_folders, set_logging, load_apps, get_directories, save_json
+from app_scraper.utils import (
+    create_app_folders,
+    set_logging,
+    load_apps,
+    get_directories,
+    save_json,
+)
 from app_scraper.constants import PLAY_STORE_LANGUAGES, PLAY_STORE_COUNTRY
+
 
 def run():
     config = ConfigFactory.parse_file("app.conf")
@@ -52,17 +59,21 @@ def run():
     for app, language in itertools.product(apps, PLAY_STORE_LANGUAGES):
         logging.info(f"Querying {app['id']} on language {language}.")
 
-        app_name_dashed = app['id'].replace(".", "-")
+        app_name_dashed = app["id"].replace(".", "-")
 
         if args.details:
-            details = google_play_scraper.app(app["id"], lang=language, country=PLAY_STORE_COUNTRY)
+            details = google_play_scraper.app(
+                app["id"], lang=language, country=PLAY_STORE_COUNTRY
+            )
             save_json(
                 f"{directories['details']}/{app_name_dashed}/{language}.json", details
             )
             logging.debug("Completed details.")
 
         if args.similar:
-            similar = play_scraper.similar(app_id=app["id"], detailed=False, hl=language, gl=PLAY_STORE_COUNTRY)
+            similar = play_scraper.similar(
+                app_id=app["id"], detailed=False, hl=language, gl=PLAY_STORE_COUNTRY
+            )
             save_json(
                 f"{directories['similar']}/{app_name_dashed}/{language}.json", similar
             )
@@ -82,9 +93,10 @@ def run():
                 df = pd.DataFrame(result)
                 df["language"] = language
                 df.to_csv(
-                    os.path.join(directories["reviews"], app_name_dashed, f"{language}.csv")
+                    os.path.join(
+                        directories["reviews"], app_name_dashed, f"{language}.csv"
+                    )
                 )
                 logging.debug("Completed reviews.")
 
         time.sleep(config.get("app.sleep"))
-

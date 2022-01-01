@@ -27,10 +27,15 @@ def create_folder(path: str) -> None:
 
 
 def create_app_folders(
-    apps: list, directories: dict, details: bool, similar: bool, reviews: bool, dashed: bool = False 
+    apps: list,
+    directories: dict,
+    details: bool,
+    similar: bool,
+    reviews: bool,
+    dashed: bool = False,
 ):
     for app in apps:
-        app_name = app['id'].replace(".", "-") if dashed else app['id']
+        app_name = app["id"].replace(".", "-") if dashed else app["id"]
         if details:
             create_folder(f"{directories['details']}/{app_name}")
         if similar:
