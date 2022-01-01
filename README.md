@@ -1,5 +1,8 @@
 # app-reviews-scraper
 
+`brew install virtualenv protobuf`
+
+
 1. App details
 1. App reviews
 1. Similar apps
