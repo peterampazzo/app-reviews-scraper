@@ -31,7 +31,7 @@ def run():
     if not any([args.reviews, args.details, args.similar]):
         # If none option are chosen, break.
         logging.error("None option.")
-        return
+        exit(1)
 
     profile = load_apps(os.path.join(config.get("location.input"), f"{args.list}.json"))
     project = profile[config.get("project_schema.project_name")]
