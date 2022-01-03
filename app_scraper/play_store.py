@@ -33,7 +33,7 @@ def run():
         logging.error("None option.")
         return
 
-    profile = load_apps(args.list)
+    profile = load_apps(os.path.join(config.get("location.input"), f"{args.list}.json"))
     project = profile[config.get("project_schema.project_name")]
     apps = [
         x[config.get("project_schema.play_store")]
@@ -100,3 +100,4 @@ def run():
                 logging.debug("Completed reviews.")
 
         time.sleep(config.get("app.sleep"))
+    logging.info("Completed.")

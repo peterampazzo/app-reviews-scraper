@@ -9,7 +9,7 @@ python = "^3.9"
 pyhocon = "^0.3.59"
 app-store-scraper = {git = "https://github.com/peterampazzo/app-store-scraper.git", rev = "master"}
 google-play-scraper = "^1.0.2"
-gcld3 = "^3.0.13"
+# gcld3 = "^3.0.13"
 pandas = "^1.3.5"
 play-scraper = "^0.6.0"
 
