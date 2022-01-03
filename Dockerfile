@@ -10,7 +10,6 @@ RUN apt-get -y install git
 
 WORKDIR /app
 COPY app_scraper app_scraper
-COPY data/apps/ input
 COPY pyproject.toml pyproject.toml
 COPY poetry.lock poetry.lock
 COPY app.conf app.conf
