@@ -73,14 +73,17 @@ def run():
             logging.debug("Completed similar.")
 
         if args.reviews:
-            client.review(sleep=config.get("app.sleep"))
+            client.review(sleep=config.get("app.sleep.apple_store"), retry_after=10)
             if client.reviews_count != 0:
+                logging.debug(f"Fetched {str(client.reviews_count)} reviews.")
                 df = pd.DataFrame(client.reviews, columns=APP_STORE_REVIEWS_COLUMNS)
                 df["country"] = country
                 df.to_csv(
                     os.path.join(directories["reviews"], app["id"], f"{country}.csv")
                 )
                 logging.debug("Completed reviews.")
+            else:
+                logging.debug("No reviwes fetched.")
 
-        time.sleep(config.get("app.sleep"))
-    logging.info("Completed.")
+        time.sleep(config.get("app.sleep.loop"))
+    logging.info("Process completed.")

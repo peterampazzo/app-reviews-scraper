@@ -14,7 +14,7 @@ requests = "2.23.0"
 type = "git"
 url = "https://github.com/peterampazzo/app-store-scraper.git"
 reference = "master"
-resolved_reference = "3e6729cc6429c2806bcde4f56ebd3d03d1bfe24d"
+resolved_reference = "997dba2cd1f0c080822d9c002a39552a2ab66ec2"
 
 [[package]]
 name = "beautifulsoup4"
@@ -121,14 +121,6 @@ pep8test = ["black", "flake8", "flake8-import-order", "pep8-naming"]
 sdist = ["setuptools_rust (>=0.11.4)"]
 ssh = ["bcrypt (>=3.1.5)"]
 test = ["pytest (>=6.2.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pretend", "iso8601", "pytz", "hypothesis (>=1.11.4,!=3.79.2)"]
-
-[[package]]
-name = "gcld3"
-version = "3.0.13"
-description = "CLD3 is a neural network model for language identification."
-category = "main"
-optional = false
-python-versions = "*"
 
 [[package]]
 name = "google-play-scraper"
@@ -392,7 +384,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "08fb170c6065a2401fc5fdea88b2f93d5a2fecfac4baedfd2a73cb510ebbb23c"
+content-hash = "fb77604ab58bfbbbb7cd1e4bcfbcb05addc61fdaf6e63a29444fc40a602b8bfe"
 
 [metadata.files]
 app-store-scraper = []
@@ -493,15 +485,6 @@ cryptography = [
     {file = "cryptography-36.0.1-pp38-pypy38_pp73-manylinux_2_24_x86_64.whl", hash = "sha256:ca28641954f767f9822c24e927ad894d45d5a1e501767599647259cbf030b903"},
     {file = "cryptography-36.0.1-pp38-pypy38_pp73-win_amd64.whl", hash = "sha256:39bdf8e70eee6b1c7b289ec6e5d84d49a6bfa11f8b8646b5b3dfe41219153316"},
     {file = "cryptography-36.0.1.tar.gz", hash = "sha256:53e5c1dc3d7a953de055d77bef2ff607ceef7a2aac0353b5d630ab67f7423638"},
-]
-gcld3 = [
-    {file = "gcld3-3.0.13-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:11a127e493c2952a83a957e2f025d6ff8b1d2efd353baa25bd99d7ceb3c96c54"},
-    {file = "gcld3-3.0.13-cp36-cp36m-manylinux2010_x86_64.whl", hash = "sha256:51538b26dd1741f49ceb03421710d4355c6ce3fd257a2ddebe868e36458f5d45"},
-    {file = "gcld3-3.0.13-cp38-cp38-macosx_10_9_x86_64.whl", hash = "sha256:fb745958278bfcc230fe3e15af3babb2752e77afd929ae0f95b9ef52648f3271"},
-    {file = "gcld3-3.0.13-cp38-cp38-manylinux2010_x86_64.whl", hash = "sha256:c6bc0ecf3d95943a2b9fe61214aab8284a3b33f25e07c6caad064ea59417620f"},
-    {file = "gcld3-3.0.13-pp36-pypy36_pp73-macosx_10_9_x86_64.whl", hash = "sha256:b56a9852861c7209434917885b8331ddf5f11d3d5810baafb9a29ffd5ccd35d1"},
-    {file = "gcld3-3.0.13-pp36-pypy36_pp73-manylinux2010_x86_64.whl", hash = "sha256:4fc4ae1c8c7baab21a46fc66074787d010ca338f5c4b2ff80dd2448d18cc3d89"},
-    {file = "gcld3-3.0.13.tar.gz", hash = "sha256:47c8c779bfe7372a38564b0cd357556dc362aec81cb55b0c889059e8b952e959"},
 ]
 google-play-scraper = [
     {file = "google-play-scraper-1.0.2.tar.gz", hash = "sha256:f885af643d3510fcb28ff9989dbfa590481e5f4bc85bb85f541027e68b5cd12c"},
