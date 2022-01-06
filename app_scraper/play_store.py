@@ -82,7 +82,7 @@ def run():
         if args.reviews:
             result = google_play_scraper.reviews_all(
                 app["id"],
-                sleep_milliseconds=config.get("app.sleep"),  # defaults to 0
+                sleep_milliseconds=config.get("app.sleep.play_store"),  # defaults to 0
                 lang=language,
                 country=PLAY_STORE_COUNTRY,
                 sort=google_play_scraper.Sort.MOST_RELEVANT,  # defaults to Sort.MOST_RELEVANT
@@ -97,7 +97,9 @@ def run():
                         directories["reviews"], app_name_dashed, f"{language}.csv"
                     )
                 )
-                logging.debug("Completed reviews.")
+                logging.debug(f"Completed reviews, {len(result)} fetched.")
+            else:
+                logging.debug("No reviwes fetched.")
 
-        time.sleep(config.get("app.sleep"))
+        time.sleep(config.get("app.sleep.loop"))
     logging.info("Completed.")
