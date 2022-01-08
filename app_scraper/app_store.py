@@ -55,35 +55,39 @@ def run():
 
     logging.info(f"Running {project} with {len(apps)} on Apple App Store.")
     for app, country in itertools.product(apps, APP_STORE_COUNTRIES):
-        logging.info(f"Querying {app['name']} on country {country}.")
-        client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
+        try:
+            logging.info(f"Querying {app['name']} on country {country}.")
+            client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
 
-        if args.details:
-            client.get_details()
-            save_json(
-                f"{directories['details']}/{app['id']}/{country}.json", client.details
-            )
-            logging.debug("Completed details.")
-
-        if args.similar:
-            client.get_similar()
-            save_json(
-                f"{directories['similar']}/{app['id']}/{country}.json", client.similar
-            )
-            logging.debug("Completed similar.")
-
-        if args.reviews:
-            client.review(sleep=config.get("app.sleep.apple_store"), retry_after=10)
-            if client.reviews_count != 0:
-                logging.debug(f"Fetched {str(client.reviews_count)} reviews.")
-                df = pd.DataFrame(client.reviews, columns=APP_STORE_REVIEWS_COLUMNS)
-                df["country"] = country
-                df.to_csv(
-                    os.path.join(directories["reviews"], app["id"], f"{country}.csv")
+            if args.details:
+                client.get_details()
+                save_json(
+                    f"{directories['details']}/{app['id']}/{country}.json", client.details
                 )
-                logging.debug("Completed reviews.")
-            else:
-                logging.debug("No reviwes fetched.")
+                logging.debug("Completed details.")
 
-        time.sleep(config.get("app.sleep.loop"))
+            if args.similar:
+                client.get_similar()
+                save_json(
+                    f"{directories['similar']}/{app['id']}/{country}.json", client.similar
+                )
+                logging.debug("Completed similar.")
+
+            if args.reviews:
+                client.review(sleep=config.get("app.sleep.apple_store"), retry_after=10)
+                if client.reviews_count != 0:
+                    logging.debug(f"Fetched {str(client.reviews_count)} reviews.")
+                    df = pd.DataFrame(client.reviews, columns=APP_STORE_REVIEWS_COLUMNS)
+                    df["country"] = country
+                    df.to_csv(
+                        os.path.join(directories["reviews"], app["id"], f"{country}.csv")
+                    )
+                    logging.debug("Completed reviews.")
+                else:
+                    logging.debug("No reviwes fetched.")
+
+            time.sleep(config.get("app.sleep.loop"))
+        except Exception as error:
+            logging.error(f"App: {app['name']} - Country: {country}.")
+            logging.error(f"Error: {error}")
     logging.info("Process completed.")

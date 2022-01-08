@@ -57,49 +57,53 @@ def run():
 
     logging.info(f"Running {project} with {len(apps)} on Google Play Store.")
     for app, language in itertools.product(apps, PLAY_STORE_LANGUAGES):
-        logging.info(f"Querying {app['id']} on language {language}.")
+        try:
+            logging.info(f"Querying {app['id']} on language {language}.")
 
-        app_name_dashed = app["id"].replace(".", "-")
+            app_name_dashed = app["id"].replace(".", "-")
 
-        if args.details:
-            details = google_play_scraper.app(
-                app["id"], lang=language, country=PLAY_STORE_COUNTRY
-            )
-            save_json(
-                f"{directories['details']}/{app_name_dashed}/{language}.json", details
-            )
-            logging.debug("Completed details.")
-
-        if args.similar:
-            similar = play_scraper.similar(
-                app_id=app["id"], detailed=False, hl=language, gl=PLAY_STORE_COUNTRY
-            )
-            save_json(
-                f"{directories['similar']}/{app_name_dashed}/{language}.json", similar
-            )
-            logging.debug("Completed similar.")
-
-        if args.reviews:
-            result = google_play_scraper.reviews_all(
-                app["id"],
-                sleep_milliseconds=config.get("app.sleep.play_store"),  # defaults to 0
-                lang=language,
-                country=PLAY_STORE_COUNTRY,
-                sort=google_play_scraper.Sort.MOST_RELEVANT,  # defaults to Sort.MOST_RELEVANT
-                filter_score_with=None,
-            )
-
-            if result != []:
-                df = pd.DataFrame(result)
-                df["language"] = language
-                df.to_csv(
-                    os.path.join(
-                        directories["reviews"], app_name_dashed, f"{language}.csv"
-                    )
+            if args.details:
+                details = google_play_scraper.app(
+                    app["id"], lang=language, country=PLAY_STORE_COUNTRY
                 )
-                logging.debug(f"Completed reviews, {len(result)} fetched.")
-            else:
-                logging.debug("No reviwes fetched.")
+                save_json(
+                    f"{directories['details']}/{app_name_dashed}/{language}.json", details
+                )
+                logging.debug("Completed details.")
 
-        time.sleep(config.get("app.sleep.loop"))
+            if args.similar:
+                similar = play_scraper.similar(
+                    app_id=app["id"], detailed=False, hl=language, gl=PLAY_STORE_COUNTRY
+                )
+                save_json(
+                    f"{directories['similar']}/{app_name_dashed}/{language}.json", similar
+                )
+                logging.debug("Completed similar.")
+
+            if args.reviews:
+                result = google_play_scraper.reviews_all(
+                    app["id"],
+                    sleep_milliseconds=config.get("app.sleep.play_store"),  # defaults to 0
+                    lang=language,
+                    country=PLAY_STORE_COUNTRY,
+                    sort=google_play_scraper.Sort.MOST_RELEVANT,  # defaults to Sort.MOST_RELEVANT
+                    filter_score_with=None,
+                )
+
+                if result != []:
+                    df = pd.DataFrame(result)
+                    df["language"] = language
+                    df.to_csv(
+                        os.path.join(
+                            directories["reviews"], app_name_dashed, f"{language}.csv"
+                        )
+                    )
+                    logging.debug(f"Completed reviews, {len(result)} fetched.")
+                else:
+                    logging.debug("No reviwes fetched.")
+
+            time.sleep(config.get("app.sleep.loop"))
+        except Exception as error:
+            logging.error(f"App: {app['id']} - Language: {language}.")
+            logging.error(f"Error: {error}")
     logging.info("Completed.")
