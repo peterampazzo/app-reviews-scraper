@@ -54,17 +54,6 @@ def get_directories(root, store, project):
     return directories
 
 
-# def init_project(project):
-#     create_folders(
-#         [f"data/{project}", f"data/{project}/app-store", f"data/{project}/play-store"]
-#     )
-
-#     for f in FOLDERS:
-#         create_folders(
-#             [f"data/{project}/app-store/{f}", f"data/{project}/play-store/{f}"]
-#         )
-
-
 def load_apps(filename: str) -> dict:
     try:
         with open(filename) as f:

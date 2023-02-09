@@ -14,6 +14,7 @@ from app_scraper.utils import (
 )
 from app_scraper.constants import APP_STORE_COUNTRIES, APP_STORE_REVIEWS_COLUMNS
 import logging
+import json
 
 
 def run():
@@ -57,12 +58,14 @@ def run():
     for app, country in itertools.product(apps, APP_STORE_COUNTRIES):
         try:
             logging.info(f"Querying {app['name']} on country {country}.")
-            client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
+            # client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
 
             if args.details:
-                client.get_details()
+                # client.get_details()
+                details = os.popen(f"node app_scraper/apple.js {app['id']} {country}").read()
+                details = json.loads(details)
                 save_json(
-                    f"{directories['details']}/{app['id']}/{country}.json", client.details
+                    f"{directories['details']}/{app['id']}/{country}.json", details
                 )
                 logging.debug("Completed details.")
 
