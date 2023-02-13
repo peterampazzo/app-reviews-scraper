@@ -58,7 +58,6 @@ def run():
     for app, country in itertools.product(apps, APP_STORE_COUNTRIES):
         try:
             logging.info(f"Querying {app['name']} on country {country}.")
-            # client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
 
             if args.details:
                 # client.get_details()
@@ -70,6 +69,7 @@ def run():
                 logging.debug("Completed details.")
 
             if args.similar:
+                client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
                 client.get_similar()
                 save_json(
                     f"{directories['similar']}/{app['id']}/{country}.json", client.similar
@@ -77,6 +77,7 @@ def run():
                 logging.debug("Completed similar.")
 
             if args.reviews:
+                client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
                 client.review(sleep=config.get("app.sleep.apple_store"), retry_after=10)
                 if client.reviews_count != 0:
                     logging.debug(f"Fetched {str(client.reviews_count)} reviews.")
