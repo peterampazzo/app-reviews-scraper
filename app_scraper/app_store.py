@@ -14,6 +14,7 @@ from app_scraper.utils import (
 )
 from app_scraper.constants import APP_STORE_COUNTRIES, APP_STORE_REVIEWS_COLUMNS
 import logging
+import json
 
 
 def run():
@@ -57,16 +58,18 @@ def run():
     for app, country in itertools.product(apps, APP_STORE_COUNTRIES):
         try:
             logging.info(f"Querying {app['name']} on country {country}.")
-            client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
 
             if args.details:
-                client.get_details()
+                # client.get_details()
+                details = os.popen(f"node app_scraper/apple.js {app['id']} {country}").read()
+                details = json.loads(details)
                 save_json(
-                    f"{directories['details']}/{app['id']}/{country}.json", client.details
+                    f"{directories['details']}/{app['id']}/{country}.json", details
                 )
                 logging.debug("Completed details.")
 
             if args.similar:
+                client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
                 client.get_similar()
                 save_json(
                     f"{directories['similar']}/{app['id']}/{country}.json", client.similar
@@ -74,6 +77,7 @@ def run():
                 logging.debug("Completed similar.")
 
             if args.reviews:
+                client = AppStore(app_name=app["name"], app_id=app["id"], country=country)
                 client.review(sleep=config.get("app.sleep.apple_store"), retry_after=10)
                 if client.reviews_count != 0:
                     logging.debug(f"Fetched {str(client.reviews_count)} reviews.")

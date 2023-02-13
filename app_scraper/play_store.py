@@ -15,6 +15,7 @@ from app_scraper.utils import (
     save_json,
 )
 from app_scraper.constants import PLAY_STORE_LANGUAGES, PLAY_STORE_COUNTRY
+import json
 
 
 def run():
@@ -63,9 +64,11 @@ def run():
             app_name_dashed = app["id"].replace(".", "-")
 
             if args.details:
-                details = google_play_scraper.app(
-                    app["id"], lang=language, country=PLAY_STORE_COUNTRY
-                )
+                # details = google_play_scraper.app(
+                #     app["id"], lang=language, country=PLAY_STORE_COUNTRY
+                # )
+                details = os.popen(f"node app_scraper/google.js {app['id']} {language}").read()
+                details = json.loads(details)
                 save_json(
                     f"{directories['details']}/{app_name_dashed}/{language}.json", details
                 )
