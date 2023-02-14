@@ -1,22 +1,26 @@
-import os
-import sys
-import glob
+"""Utility functions"""
+
 import json
-import re
-import pandas as pd
-from app_scraper.constants import FOLDERS
 import logging
+import os
+import re
+import sys
+from datetime import datetime, timedelta
 
 
 def set_logging(config):
+    sh = logging.StreamHandler(sys.stdout)
+    fh = logging.FileHandler("scraper.logs", mode="a")
     logging.basicConfig(
         level=logging.getLevelName(config.get("app.logging_level")),
         format="[%(asctime)s] - %(levelname)s - %(name)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
-        stream=sys.stdout,
+        handlers=[sh, fh]
     )
+
     for logger in config.get("app.logger"):
-        logging.getLogger(logger).setLevel(
+        logger = logging.getLogger(logger)
+        logger.setLevel(
             logging.getLevelName(config.get("app.logging_level_modules"))
         )
 
@@ -54,17 +58,6 @@ def get_directories(root, store, project):
     return directories
 
 
-# def init_project(project):
-#     create_folders(
-#         [f"data/{project}", f"data/{project}/app-store", f"data/{project}/play-store"]
-#     )
-
-#     for f in FOLDERS:
-#         create_folders(
-#             [f"data/{project}/app-store/{f}", f"data/{project}/play-store/{f}"]
-#         )
-
-
 def load_apps(filename: str) -> dict:
     try:
         with open(filename) as f:
@@ -73,6 +66,7 @@ def load_apps(filename: str) -> dict:
         return apps
     except FileNotFoundError:
         logging.error(f"{filename} doesn't exist.")
+        raise FileNotFoundError(f"{filename} doesn't exist.")
 
 
 def save_json(filename: str, content) -> None:
@@ -137,3 +131,13 @@ def play_store_country(filename):
 
 def app_store_country(filename):
     return re.search("(.+?)(\.[^.]*$|$)", filename).group(1)
+
+
+def file_needs_update(fpath: str, n_weeks: int) -> bool: 
+    """Returns true if file does not exist, or is older than n weeks"""
+    if not os.path.exists(fpath): 
+        return True 
+    mdate = datetime.fromtimestamp(os.path.getmtime(fpath))
+    stale = datetime.now() - mdate > timedelta(weeks=n_weeks)
+    return stale
+    

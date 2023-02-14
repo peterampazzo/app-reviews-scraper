@@ -246,4 +246,3 @@ APP_STORE_COUNTRIES = {
     "za": "South Africa",
     "zw": "Zimbabwe"
 }
-APP_STORE_REVIEWS_COLUMNS = ["country","date","title","userName","rating","review","isEdited"]
