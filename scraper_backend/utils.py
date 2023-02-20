@@ -15,14 +15,12 @@ def set_logging(config):
         level=logging.getLevelName(config.get("app.logging_level")),
         format="[%(asctime)s] - %(levelname)s - %(name)s - %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
-        handlers=[sh, fh]
+        handlers=[sh, fh],
     )
 
     for logger in config.get("app.logger"):
         logger = logging.getLogger(logger)
-        logger.setLevel(
-            logging.getLevelName(config.get("app.logging_level_modules"))
-        )
+        logger.setLevel(logging.getLevelName(config.get("app.logging_level_modules")))
 
 
 def create_folder(path: str) -> None:
@@ -75,7 +73,6 @@ def save_json(filename: str, content) -> None:
 
 
 def merge_reviews(appslist):
-
     # android
     project_folder = f"data/{appslist.project}/play-store/reviews"
 
@@ -133,11 +130,10 @@ def app_store_country(filename):
     return re.search("(.+?)(\.[^.]*$|$)", filename).group(1)
 
 
-def file_needs_update(fpath: str, n_weeks: int) -> bool: 
+def file_needs_update(fpath: str, n_weeks: int) -> bool:
     """Returns true if file does not exist, or is older than n weeks"""
-    if not os.path.exists(fpath): 
-        return True 
+    if not os.path.exists(fpath):
+        return True
     mdate = datetime.fromtimestamp(os.path.getmtime(fpath))
     stale = datetime.now() - mdate > timedelta(weeks=n_weeks)
     return stale
-    
