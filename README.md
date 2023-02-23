@@ -11,9 +11,9 @@ Script for scraping app details, reviews and similar apps from the Apple App Sto
 
 ## Installation 
 
-Install [poetry](https://python-poetry.org/docs/) and then: 
-```bash 
-poetry install
+Install the requirements via pip (preferably in a clean evironment): 
+```
+pip install -r requirements.txt 
 ```
 
 To run the detect language job make sure to install:
@@ -25,7 +25,7 @@ brew install virtualenv protobuf
 
 Scrape app details, reviews and similars for the apps in a JSON list: 
 ```
-poetry run python scraper.py --list path/to/list.json --store app --details --similar --reviews --refresh 1 
+python scraper.py --list path/to/list.json --store app --details --similar --reviews
 ```
 
 For full usage, run `python scraper.py -h`
@@ -164,7 +164,6 @@ An example of the folder structure.
 │   │           │   ├── zh-TW.json
 │   │           │   └── zu.json
 ├── package.json
-├── poetry.lock
 ├── pyproject.toml
 └── yarn.lock
 ```
