@@ -1,5 +1,9 @@
 # fmt: off
 
+STORE_NAMES = { 
+    "apple": "app", 
+    "google": "play"
+}
 FOLDERS = ["reviews", "similar", "details"]
 # https://github.com/danieliu/play-scraper/blob/master/play_scraper/constants.py#L3
 PLAY_STORE_LANGUAGES = {

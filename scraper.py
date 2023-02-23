@@ -13,19 +13,22 @@ from scraper_backend.clients import AppleClient, GoogleClient
 from scraper_backend import constants
 from scraper_backend import utils
 
-
 def run(
     app_list: str,
-    store: str,
+    app_store_name: str,
     reviews: bool = False,
     details: bool = False,
     similar: bool = False,
-    refresh_weeks: float = 1.0,
+    refresh_weeks = None,
 ):
     """Main scraper function. See __main__ argparse below for args"""
 
     if not any([reviews, details, similar]):
         raise RuntimeError("At least one of [reviews,details,similar] must be set.")
+
+    # Internally, we use "app" to refer to Apple and "play" for Google,
+    # as encoded in the constants file 
+    store = constants.STORE_NAMES[app_store_name]
 
     # Load store-specific configuration and app lists
     config = ConfigFactory.parse_file("app.conf")
@@ -37,6 +40,10 @@ def run(
         for x in profile[config.get("project_schema.list_apps")]
         if x[config.get(f"project_schema.{store}_store")] != None
     ]
+    if not refresh_weeks: 
+        refresh_weeks = config.get('app').get('refresh_weeks')
+    else: 
+        refresh_weeks = float(refresh_weeks)
 
     # Play store apps don't have an explicit name but this code requires that,
     # so we just use the ID as name
@@ -134,8 +141,8 @@ def run(
 
 
 if __name__ == "__main__":
-    # import sys
-    # sys.argv[1:] = "--list data/apps/example.json --store app --details --similar --reviews".split()
+    import sys
+    sys.argv[1:] = "--list data/apps/example.json --store apple --details --similar --reviews".split()
 
     parser = argparse.ArgumentParser(description="Query an app store.")
     parser.add_argument(
@@ -148,9 +155,10 @@ if __name__ == "__main__":
     parser.add_argument(
         "--store",
         type=str,
-        choices=["app", "play"],
+        choices=["apple", "google"],
         required=True,
-        help="which store to query, app (Apple) or play (Google)",
+        dest="app_store_name", 
+        help="which app store to query, apple (App Store) or google (Play Store)",
     )
     parser.add_argument("--reviews", action="store_true", help="fetch app reviews")
     parser.add_argument("--details", action="store_true", help="fetch app details")
@@ -159,8 +167,7 @@ if __name__ == "__main__":
         "--refresh",
         type=float,
         dest="refresh_weeks",
-        default=1.0,
-        help="refresh past results older than N weeks from now (default: %(default)s)",
+        help="refresh past results older than N weeks from now (default set in app.conf)",
     )
 
     run(**vars(parser.parse_args()))
