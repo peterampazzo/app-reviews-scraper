@@ -141,8 +141,8 @@ def run(
 
 
 if __name__ == "__main__":
-    import sys
-    sys.argv[1:] = "--list data/apps/example.json --store apple --details --similar --reviews".split()
+    # import sys
+    # sys.argv[1:] = "--list data/apps/example.json --store apple --details --similar --reviews".split()
 
     parser = argparse.ArgumentParser(description="Query an app store.")
     parser.add_argument(
