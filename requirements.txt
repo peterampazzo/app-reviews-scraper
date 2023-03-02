@@ -4,3 +4,5 @@ app-store-scraper @ git+https://github.com/peterampazzo/app-store-scraper.git@ma
 google-play-scraper >= 1.0.2
 play-scraper >= 0.6.0
 pyhocon >= 0.3.59
+schedule 
+enlighten 

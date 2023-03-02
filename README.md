@@ -49,6 +49,9 @@ Assuming the JSON input lists are in the `data/` directory, then the output will
 docker run -t -v $(pwd)/data:/app/data app-reviews-scraper --list data/apps/example.json --store apple --details --similar --reviews
 ```
 
+### Status reporting 
+Status reporting is possible with an account on `www.healthchecks.io`. Set up a project on there, get a URL for pinging, and then write this into `utils.send_healthcheck()` and enable the code block at `scraper.py#L82`. 
+
 ## App lists
 
 The input JSON app lists should be structured as follows:

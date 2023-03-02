@@ -5,12 +5,45 @@ import logging
 import os
 import re
 import sys
+import threading
+import time
 from datetime import datetime, timedelta
+
+import requests
+import schedule
+
+
+def launch_background_task(interval_secs=10):
+    """Run the scheduler's run_pending() on continuous loop,
+    which ensures that the background task happens independently
+    of the main thread.
+    """
+
+    class ScheduleThread(threading.Thread):
+        @classmethod
+        def run(cls):
+            while True:
+                schedule.run_pending()
+                time.sleep(interval_secs)
+
+    continuous_thread = ScheduleThread()
+    continuous_thread.start()
+
+
+def send_healthcheck():
+    """Sends a ping to the healthcheck UUID"""
+
+    try:
+        requests.get(
+            "https://hc-ping.com/8e18eaf0-8829-40ae-ae31-d5dfbbfab5f8", timeout=10
+        )
+    except requests.RequestException as e:
+        logging.error("Healthcheck ping failed: %s" % e)
 
 
 def set_logging(config):
     sh = logging.StreamHandler(sys.stdout)
-    fh = logging.FileHandler("scraper.logs", mode="a")
+    fh = logging.FileHandler("data/scraper.logs", mode="a")
     logging.basicConfig(
         level=logging.getLevelName(config.get("app.logging_level")),
         format="[%(asctime)s] - %(levelname)s - %(name)s - %(message)s",
@@ -72,54 +105,54 @@ def save_json(filename: str, content) -> None:
         json.dump(content, f)
 
 
-def merge_reviews(appslist):
-    # android
-    project_folder = f"data/{appslist.project}/play-store/reviews"
+# def merge_reviews(appslist):
+#     # android
+#     project_folder = f"data/{appslist.project}/play-store/reviews"
 
-    for subdir, dirs, files in os.walk(project_folder):
-        files = [f for f in files if not f[0] == "."]
-        dirs[:] = [d for d in dirs if not d[0] == "."]
+#     for subdir, dirs, files in os.walk(project_folder):
+#         files = [f for f in files if not f[0] == "."]
+#         dirs[:] = [d for d in dirs if not d[0] == "."]
 
-        print(f"Found directory: {subdir}")
-        reviews = pd.DataFrame()
-        for fname in files:
-            print(f"\t {fname}")
-            df = pd.read_csv(f"{subdir}/{fname}")
+#         print(f"Found directory: {subdir}")
+#         reviews = pd.DataFrame()
+#         for fname in files:
+#             print(f"\t {fname}")
+#             df = pd.read_csv(f"{subdir}/{fname}")
 
-            language = re.search("\-([^\.]+)\.", fname).group(1)
+#             language = re.search("\-([^\.]+)\.", fname).group(1)
 
-            df["lang"] = language
-            reviews = reviews.append(df)
+#             df["lang"] = language
+#             reviews = reviews.append(df)
 
-        reviews.to_csv(f"{subdir}/reviews.csv")
+#         reviews.to_csv(f"{subdir}/reviews.csv")
 
-    # ios
-    # TODO
+#     # ios
+#     # TODO
 
 
-def app_store_details_merge(appslist):
-    project_folder = f"data/{appslist.project}/app-store/details"
-    for subdir, dirs, files in os.walk(project_folder):
-        apps = pd.DataFrame()
-        for fname in files:
-            if fname != "apps.csv":
-                print(fname)
+# def app_store_details_merge(appslist):
+#     project_folder = f"data/{appslist.project}/app-store/details"
+#     for subdir, dirs, files in os.walk(project_folder):
+#         apps = pd.DataFrame()
+#         for fname in files:
+#             if fname != "apps.csv":
+#                 print(fname)
 
-                with open(f"{subdir}/{fname}") as f:
-                    data = json.load(f)
+#                 with open(f"{subdir}/{fname}") as f:
+#                     data = json.load(f)
 
-                del data["genres"]
-                del data["genreIds"]
-                del data["screenshots"]
-                del data["languages"]
-                del data["supportedDevices"]
-                del data["ipadScreenshots"]
-                del data["appletvScreenshots"]
+#                 del data["genres"]
+#                 del data["genreIds"]
+#                 del data["screenshots"]
+#                 del data["languages"]
+#                 del data["supportedDevices"]
+#                 del data["ipadScreenshots"]
+#                 del data["appletvScreenshots"]
 
-                df = pd.DataFrame(data, index=[0])
-                apps = apps.append(df)
+#                 df = pd.DataFrame(data, index=[0])
+#                 apps = apps.append(df)
 
-        apps.to_csv(f"{subdir}/apps.csv")
+#         apps.to_csv(f"{subdir}/apps.csv")
 
 
 def play_store_country(filename):

@@ -111,7 +111,5 @@ class AppleClient:
     def get_reviews(self) -> list:
         """Return app's reviews as JSON"""
 
-        self.client.review(
-            retry_after=10, sleep=config.get("app.sleep.apple_store")
-        )
+        self.client.review(retry_after=10, sleep=config.get("app.sleep.apple_store"))
         return self.client.reviews

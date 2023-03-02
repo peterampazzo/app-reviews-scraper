@@ -6,12 +6,14 @@ import logging
 import os.path as op
 import time
 
+import enlighten
 import pandas as pd
+import schedule
 from pyhocon import ConfigFactory
 
+from scraper_backend import constants, utils
 from scraper_backend.clients import AppleClient, GoogleClient
-from scraper_backend import constants
-from scraper_backend import utils
+
 
 def run(
     app_list: str,
@@ -19,7 +21,7 @@ def run(
     reviews: bool = False,
     details: bool = False,
     similar: bool = False,
-    refresh_weeks = None,
+    refresh_weeks=None,
 ):
     """Main scraper function. See __main__ argparse below for args"""
 
@@ -27,7 +29,7 @@ def run(
         raise RuntimeError("At least one of [reviews,details,similar] must be set.")
 
     # Internally, we use "app" to refer to Apple and "play" for Google,
-    # as encoded in the constants file 
+    # as encoded in the constants file
     store = constants.STORE_NAMES[app_store_name]
 
     # Load store-specific configuration and app lists
@@ -40,9 +42,9 @@ def run(
         for x in profile[config.get("project_schema.list_apps")]
         if x[config.get(f"project_schema.{store}_store")] != None
     ]
-    if not refresh_weeks: 
-        refresh_weeks = config.get('app').get('refresh_weeks')
-    else: 
+    if not refresh_weeks:
+        refresh_weeks = config.get("app").get("refresh_weeks")
+    else:
         refresh_weeks = float(refresh_weeks)
 
     # Play store apps don't have an explicit name but this code requires that,
@@ -72,7 +74,20 @@ def run(
         iterpairs = itertools.product(apps, constants.APP_STORE_COUNTRIES)
     elif store == "play":
         iterpairs = itertools.product(apps, constants.PLAY_STORE_LANGUAGES)
+    iterpairs = list(iterpairs)
     logging.info(f"Running {project} with {len(apps)} on {store} store.")
+
+    # To enable status reporting via ping. See utils.send_healthcheck() to 
+    # enter the correct ping URL. 
+    if False: 
+        schedule.every(5).minutes.do(utils.send_healthcheck)
+        utils.launch_background_task()
+
+    # Progress bar 
+    manager = enlighten.get_manager()
+    pbar = manager.counter(
+        total=len(iterpairs), desc="(app, locale) pairs", unit="pairs"
+    )
 
     # Ready to do the scraping....
     for app, locale in iterpairs:
@@ -136,13 +151,14 @@ def run(
         # Sleep at end of (app, locale) pair to avoid hitting API request limits
         finally:
             time.sleep(config.get("app.sleep.loop"))
+            pbar.update()
 
     logging.info("Process completed.")
 
 
 if __name__ == "__main__":
-    # import sys
-    # sys.argv[1:] = "--list data/apps/example.json --store apple --details --similar --reviews".split()
+    import sys
+    sys.argv[1:] = "--list data/apps/example.json --store apple --details --similar --reviews".split()
 
     parser = argparse.ArgumentParser(description="Query an app store.")
     parser.add_argument(
@@ -157,7 +173,7 @@ if __name__ == "__main__":
         type=str,
         choices=["apple", "google"],
         required=True,
-        dest="app_store_name", 
+        dest="app_store_name",
         help="which app store to query, apple (App Store) or google (Play Store)",
     )
     parser.add_argument("--reviews", action="store_true", help="fetch app reviews")
