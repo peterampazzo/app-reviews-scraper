@@ -2,14 +2,9 @@
 
 Script for scraping app details, reviews and similar apps from the Apple App Store or Google Play Store.
 
-## Instructions from Francesco
-
--    Given a list of apps ID download the similar apps, reviews and ratings.
--    Improve the handling of exceptions (ie, time out, too many requests, validating countries without data, validating language -number reviews download vs printed on the page)
--    Number of rating and similar apps are fetched from the two stores using libraries written in NodeJS - consider a way to make it more consistent with the rest of the Python codebase
--    Trigger automatic downloading (ie, Airflow trigger of docker image which dumps the data in S3 - needs to be discussed with Doug)
-
 ## Installation 
+
+### Locally
 
 Install the requirements via pip (preferably in a clean evironment): 
 ```
@@ -21,20 +16,38 @@ To run the detect language job make sure to install:
 brew install virtualenv protobuf
 ```
 
+### Docker 
+
+```
+docker build -t app-reviews-scraper .
+```
+
 ## Usage 
-
-Scrape app details, reviews and similars for the apps in a JSON list: 
-```
-python scraper.py --list path/to/list.json --store app --details --similar --reviews
-```
-
-For full usage, run `python scraper.py -h`
-
-> **Warning** 
-> To avoid hitting request limits for the app store APIs, the script will only update results on the local filesystem older than `REFRESH` weeks (default = 1). 
 
 The `app.conf` file contains further configuration options, for example the sleep time between requests.
 
+> **Warning** 
+> To avoid hitting request limits for the app store APIs, the script will only update results on the local filesystem older than `REFRESH` weeks (default = 1, set in `app.conf`). 
+
+### Locally 
+
+Scrape app details, reviews and similars for the apps in a JSON list: 
+```
+python scraper.py --list path/to/list.json --store apple --details --similar --reviews
+```
+
+For full usage, run
+```
+python scraper.py -h 
+```
+
+### Docker 
+
+When running on Docker, the container needs to be able to access the host filesystem for read/write access. 
+Assuming the JSON input lists are in the `data/` directory, then the output will also go in this same directory (as well as the logfile). This is conveyed using the `-v` flag. 
+```
+docker run -t -v $(pwd)/data:/app/data app-reviews-scraper --list data/apps/example.json --store apple --details --similar --reviews
+```
 
 ## App lists
 
