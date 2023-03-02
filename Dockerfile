@@ -1,22 +1,22 @@
-FROM python:3.9-slim
+# For more information, please refer to https://aka.ms/vscode-docker-python
+FROM python:3.10-slim
+RUN apt-get update
+RUN apt-get install git -y
 
-RUN apt-get -y update
-RUN apt-get -y upgrade
+# Keeps Python from generating .pyc files in the container
+ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN apt-get -y install \
-    make gcc g++ python3 python3-dev libc-dev
+# Turns off buffering for easier container logging
+ENV PYTHONUNBUFFERED=1
 
-RUN apt-get -y install git
+# Install pip requirements
+COPY requirements.txt .
+RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
-COPY app_scraper app_scraper
-COPY pyproject.toml pyproject.toml
-COPY poetry.lock poetry.lock
-COPY app.conf app.conf
+COPY app.conf /app
+COPY scraper_backend /app/scraper_backend
+COPY scraper.py /app
 
-RUN pip install poetry 
-RUN poetry install --no-dev
-
-# CMD ["sh", "-c", "tail -f /dev/null"]
-
-ENTRYPOINT ["poetry", "run"]
+# ENTRYPOINT ["ls", "data/apps/"]
+ENTRYPOINT ["python", "scraper.py"]
