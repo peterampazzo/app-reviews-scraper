@@ -194,5 +194,5 @@ if __name__ == "__main__":
         help="fetch a maximum of N reviews (default set in app.conf)"
     )
 
-    cmd = "--list data/apps/example.json --store apple --details --similar --reviews".split()
-    run(**vars(parser.parse_args(cmd)))
+    # cmd = "--list data/apps/example.json --store apple --details --similar --reviews".split()
+    run(**vars(parser.parse_args()))
