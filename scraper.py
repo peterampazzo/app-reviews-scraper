@@ -4,6 +4,7 @@ import argparse
 import itertools
 import logging
 import os.path as op
+import sys
 import time
 
 import enlighten
@@ -22,7 +23,7 @@ def run(
     details: bool = False,
     similar: bool = False,
     refresh_weeks=None,
-    review_count=None
+    review_count=None,
 ):
     """Main scraper function. See __main__ argparse below for args"""
 
@@ -48,10 +49,12 @@ def run(
     else:
         refresh_weeks = float(refresh_weeks)
 
-    if not review_count: 
+    if not review_count:
         review_count = config.get("app").get("review_count")
-    else: 
+    else:
         review_count = int(review_count)
+    if review_count == -1:
+        review_count = sys.maxsize
 
     # Play store apps don't have an explicit name but this code requires that,
     # so we just use the ID as name
@@ -83,13 +86,13 @@ def run(
     iterpairs = list(iterpairs)
     logging.info(f"Running {project} with {len(apps)} on {store} store.")
 
-    # To enable status reporting via ping. See utils.send_healthcheck() to 
-    # enter the correct ping URL. 
-    if False: 
+    # To enable status reporting via ping. See utils.send_healthcheck() to
+    # enter the correct ping URL.
+    if False:
         schedule.every(5).minutes.do(utils.send_healthcheck)
         utils.launch_background_task()
 
-    # Progress bar 
+    # Progress bar
     manager = enlighten.get_manager()
     pbar = manager.counter(
         total=len(iterpairs), desc="(app, locale) pairs", unit="pairs"
@@ -189,9 +192,9 @@ if __name__ == "__main__":
         help="refresh past results older than N weeks from now (default set in app.conf)",
     )
     parser.add_argument(
-        "--review-count", 
+        "--review-count",
         type=int,
-        help="fetch a maximum of N reviews (default set in app.conf)"
+        help="fetch a maximum of N reviews (default set in app.conf). Set -1 for all reviews.",
     )
 
     # cmd = "--list data/apps/example.json --store apple --details --similar --reviews".split()
