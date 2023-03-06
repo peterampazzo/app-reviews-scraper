@@ -110,7 +110,7 @@ def run(
 
             # Fetch app details
             dpath = op.join(directories["details"], app_dirname, f"{locale}.json")
-            if details and utils.file_needs_update(dpath, refresh_weeks):
+            if utils.file_needs_update(dpath, refresh_weeks):
                 details = client.get_details()
                 utils.save_json(dpath, details)
                 logging.debug("Completed details.")
@@ -119,7 +119,7 @@ def run(
 
             # Fetch similar apps
             spath = op.join(directories["similar"], app_dirname, f"{locale}.json")
-            if similar and utils.file_needs_update(spath, refresh_weeks):
+            if utils.file_needs_update(spath, refresh_weeks):
                 similar = client.get_similar()
                 utils.save_json(spath, similar)
                 logging.debug("Completed similar.")
@@ -128,7 +128,7 @@ def run(
 
             # Fetch app reviews
             rpath = op.join(directories["reviews"], app_dirname, f"{locale}.csv")
-            if reviews and utils.file_needs_update(rpath, refresh_weeks):
+            if utils.file_needs_update(rpath, refresh_weeks):
                 reviews = client.get_reviews()
                 if len(reviews):
                     logging.debug(f"Fetched {len(reviews)} reviews.")
