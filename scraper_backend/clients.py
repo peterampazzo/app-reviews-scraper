@@ -16,6 +16,8 @@ for both app stores.
 
 """
 
+import sys 
+
 import app_store_scraper
 import google_play_scraper
 import play_scraper
@@ -63,15 +65,16 @@ class GoogleClient:
             self.app_id, hl=self.language, gl=PLAY_STORE_COUNTRY
         )
 
-    def get_reviews(self) -> list:
+    def get_reviews(self, count=sys.maxsize) -> list:
         """Return app's reviews as JSON"""
-        return google_play_scraper.reviews_all(
+        reviews, token = google_play_scraper.reviews(
             self.app_id,
-            sleep_milliseconds=config.get("app.sleep.play_store"),
+            count=count,
+            # sleep_milliseconds=config.get("app.sleep.play_store"),
             lang=self.language,
             country=PLAY_STORE_COUNTRY,
         )
-
+        return reviews
 
 class AppleClient:
     def __init__(self, app_name: str, app_id: int, country: str):
@@ -108,8 +111,12 @@ class AppleClient:
         self.client.get_similar()
         return self.client.similar
 
-    def get_reviews(self) -> list:
+    def get_reviews(self, count=sys.maxsize) -> list:
         """Return app's reviews as JSON"""
 
-        self.client.review(retry_after=10, sleep=config.get("app.sleep.apple_store"))
+        self.client.review(
+            how_many=count, 
+            retry_after=10, 
+            sleep=config.get("app.sleep.apple_store")
+        )
         return self.client.reviews

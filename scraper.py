@@ -22,6 +22,7 @@ def run(
     details: bool = False,
     similar: bool = False,
     refresh_weeks=None,
+    review_count=None
 ):
     """Main scraper function. See __main__ argparse below for args"""
 
@@ -46,6 +47,11 @@ def run(
         refresh_weeks = config.get("app").get("refresh_weeks")
     else:
         refresh_weeks = float(refresh_weeks)
+
+    if not review_count: 
+        review_count = config.get("app").get("review_count")
+    else: 
+        review_count = int(review_count)
 
     # Play store apps don't have an explicit name but this code requires that,
     # so we just use the ID as name
@@ -129,7 +135,7 @@ def run(
             # Fetch app reviews
             rpath = op.join(directories["reviews"], app_dirname, f"{locale}.csv")
             if utils.file_needs_update(rpath, refresh_weeks):
-                reviews = client.get_reviews()
+                reviews = client.get_reviews(review_count)
                 if len(reviews):
                     logging.debug(f"Fetched {len(reviews)} reviews.")
                     df = pd.DataFrame(reviews)
@@ -182,5 +188,11 @@ if __name__ == "__main__":
         dest="refresh_weeks",
         help="refresh past results older than N weeks from now (default set in app.conf)",
     )
+    parser.add_argument(
+        "--review-count", 
+        type=int,
+        help="fetch a maximum of N reviews (default set in app.conf)"
+    )
 
-    run(**vars(parser.parse_args()))
+    cmd = "--list data/apps/example.json --store apple --details --similar --reviews".split()
+    run(**vars(parser.parse_args(cmd)))
