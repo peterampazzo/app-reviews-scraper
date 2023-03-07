@@ -119,29 +119,29 @@ def run(
 
             # Fetch app details
             dpath = op.join(directories["details"], app_dirname, f"{locale}.json")
-            if utils.file_needs_update(dpath, refresh_weeks):
-                details = client.get_details()
-                utils.save_json(dpath, details)
+            if details and utils.file_needs_update(dpath, refresh_weeks):
+                dets = client.get_details()
+                utils.save_json(dpath, dets)
                 logging.debug("Completed details.")
             else:
                 logging.debug("Details did not need update")
 
             # Fetch similar apps
             spath = op.join(directories["similar"], app_dirname, f"{locale}.json")
-            if utils.file_needs_update(spath, refresh_weeks):
-                similar = client.get_similar()
-                utils.save_json(spath, similar)
+            if similar and utils.file_needs_update(spath, refresh_weeks):
+                sim = client.get_similar()
+                utils.save_json(spath, sim)
                 logging.debug("Completed similar.")
             else:
                 logging.debug("Similar did not need update")
 
             # Fetch app reviews
             rpath = op.join(directories["reviews"], app_dirname, f"{locale}.csv")
-            if utils.file_needs_update(rpath, refresh_weeks):
-                reviews = client.get_reviews(review_count)
-                if len(reviews):
-                    logging.debug(f"Fetched {len(reviews)} reviews.")
-                    df = pd.DataFrame(reviews)
+            if reviews and utils.file_needs_update(rpath, refresh_weeks):
+                rev = client.get_reviews(review_count)
+                if len(rev):
+                    logging.debug(f"Fetched {len(rev)} reviews.")
+                    df = pd.DataFrame(rev)
                     if store == "app":
                         df["country"] = locale
                     else:
