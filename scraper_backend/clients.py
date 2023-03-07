@@ -16,7 +16,7 @@ for both app stores.
 
 """
 
-import sys 
+import sys
 
 import app_store_scraper
 import google_play_scraper
@@ -76,6 +76,7 @@ class GoogleClient:
         )
         return reviews
 
+
 class AppleClient:
     def __init__(self, app_name: str, app_id: int, country: str):
         """
@@ -115,8 +116,6 @@ class AppleClient:
         """Return app's reviews as JSON"""
 
         self.client.review(
-            how_many=count, 
-            retry_after=10, 
-            sleep=config.get("app.sleep.apple_store")
+            how_many=count, retry_after=10, sleep=config.get("app.sleep.apple_store")
         )
         return self.client.reviews

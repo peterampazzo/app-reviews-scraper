@@ -44,12 +44,12 @@ def run(
         for x in profile[config.get("project_schema.list_apps")]
         if x[config.get(f"project_schema.{store}_store")] != None
     ]
-    if not refresh_weeks:
+    if refresh_weeks is None:
         refresh_weeks = config.get("app").get("refresh_weeks")
     else:
         refresh_weeks = float(refresh_weeks)
 
-    if not review_count:
+    if review_count is None:
         review_count = config.get("app").get("review_count")
     else:
         review_count = int(review_count)
