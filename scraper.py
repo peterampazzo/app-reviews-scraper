@@ -88,7 +88,7 @@ def run(
 
     # To enable status reporting via ping. See utils.send_healthcheck() to
     # enter the correct ping URL.
-    if False:
+    if config.get("healthcheck") != "":
         schedule.every(5).minutes.do(utils.send_healthcheck)
         utils.launch_background_task()
 

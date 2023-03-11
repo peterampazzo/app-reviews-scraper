@@ -11,6 +11,9 @@ from datetime import datetime, timedelta
 
 import requests
 import schedule
+from pyhocon import ConfigFactory
+
+config = ConfigFactory.parse_file("app.conf")
 
 
 def launch_background_task(interval_secs=10):
@@ -34,16 +37,17 @@ def send_healthcheck():
     """Sends a ping to the healthcheck UUID"""
 
     try:
-        requests.get(
-            "https://hc-ping.com/8e18eaf0-8829-40ae-ae31-d5dfbbfab5f8", timeout=10
+        r = requests.get(
+            f"https://hc-ping.com/{config.get('healthcheck')}", timeout=10
         )
+        assert r.status_code == 200
     except requests.RequestException as e:
         logging.error("Healthcheck ping failed: %s" % e)
 
 
 def set_logging(config):
     sh = logging.StreamHandler(sys.stdout)
-    fh = logging.FileHandler("data/scraper.logs", mode="a")
+    fh = logging.FileHandler(f"data/{config.get('app.logs_file')}.log", mode="a")
     logging.basicConfig(
         level=logging.getLevelName(config.get("app.logging_level")),
         format="[%(asctime)s] - %(levelname)s - %(name)s - %(message)s",

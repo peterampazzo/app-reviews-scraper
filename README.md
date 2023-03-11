@@ -49,8 +49,13 @@ Assuming the JSON input lists are in the `data/` directory, then the output will
 docker run -t -v $(pwd)/data:/app/data app-reviews-scraper --list data/apps/example.json --store apple --details --similar --reviews
 ```
 
+Optional:
+```
+docker run -t -v $(pwd)/data:/app/data -e HEALTH_CHECK=something -e LOGS_FILE=example app-reviews-scraper --list data/apps/example.json --store apple --details --similar --reviews
+```
+
 ### Status reporting 
-Status reporting is possible with an account on `www.healthchecks.io`. Set up a project on there, get a URL for pinging, and then write this into `utils.send_healthcheck()` and enable the code block at `scraper.py#L82`. 
+Status reporting is possible with an account on `www.healthchecks.io`. Set up a project on there, get a URL for pinging, and then assign to the `HEALTH_CHECK` env variable the profile id. 
 
 ## App lists
 
