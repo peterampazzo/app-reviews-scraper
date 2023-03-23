@@ -7,11 +7,11 @@ __pycache__/
 tmp/
 data/
 
-notebooks/
-
 env/
 dist/
 *.egg-info
 build/
 
-*logs 
+*.log
+
+.ipynb_checkpoints
