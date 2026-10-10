@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 import requests
 import schedule
 from pyhocon import ConfigFactory
+from .storage import write_bytes
 
 config = ConfigFactory.parse_file("app.conf")
 
@@ -47,7 +48,9 @@ def send_healthcheck():
 
 def set_logging(config):
     sh = logging.StreamHandler(sys.stdout)
-    fh = logging.FileHandler(f"data/{config.get('app.logs_file')}.log", mode="a")
+    log_root = config.get('location.main')
+    os.makedirs(log_root, exist_ok=True)
+    fh = logging.FileHandler(os.path.join(log_root, f"{config.get('app.logs_file')}.log"), mode="a")
     logging.basicConfig(
         level=logging.getLevelName(config.get("app.logging_level")),
         format="[%(asctime)s] - %(levelname)s - %(name)s - %(message)s",
@@ -105,8 +108,7 @@ def load_apps(filename: str) -> dict:
 
 
 def save_json(filename: str, content) -> None:
-    with open(filename, "w") as f:
-        json.dump(content, f)
+    write_bytes(filename, json.dumps(content, ensure_ascii=False).encode('utf-8'))
 
 
 # def merge_reviews(appslist):

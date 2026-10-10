@@ -250,3 +250,17 @@ APP_STORE_COUNTRIES = {
     "za": "South Africa",
     "zw": "Zimbabwe"
 }
+
+# The original 155-store list predates Apple's April 2020 expansion to 175.
+# https://www.apple.com/newsroom/2020/04/apple-services-now-available-in-more-countries-around-the-world/
+APP_STORE_COUNTRIES['cg'] = 'Republic of the Congo'
+APP_STORE_COUNTRIES.update({
+    'cm': 'Cameroon', 'ci': "Côte d’Ivoire", 'cd': 'Democratic Republic of the Congo',
+    'ga': 'Gabon', 'ly': 'Libya', 'ma': 'Morocco', 'rw': 'Rwanda', 'zm': 'Zambia',
+    'mv': 'Maldives', 'mm': 'Myanmar', 'ba': 'Bosnia and Herzegovina', 'ge': 'Georgia',
+    'xk': 'Kosovo', 'me': 'Montenegro', 'rs': 'Serbia', 'af': 'Afghanistan',
+    'iq': 'Iraq', 'nr': 'Nauru', 'to': 'Tonga', 'vu': 'Vanuatu',
+})
+# Preserve the old queries, while adding Amharic's actual language code.
+PLAY_STORE_LANGUAGES['sm'] = 'Samoan'
+PLAY_STORE_LANGUAGES['am'] = 'Amharic'

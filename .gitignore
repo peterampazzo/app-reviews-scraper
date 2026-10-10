@@ -15,3 +15,17 @@ dist/
 build/
 
 *logs 
+.venv/
+diagnostics/*.html
+diagnostics/*.js
+diagnostics/*-reviews.json
+
+diagnostics/
+original-install.log
+!data/
+data/*
+!data/apps/
+data/apps/*
+!data/apps/zoe.json
+!data/apps/surge.json
+.runtime/

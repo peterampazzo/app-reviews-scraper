@@ -201,3 +201,7 @@ An example of the folder structure.
 - https://github.com/cowboy-bebug/app-store-scraper
 - https://github.com/facundoolano/app-store-scraper
 
+
+## Zoe research collection (2026 compatibility update)
+
+See [ZOE_RESEARCH_NOTES.md](ZOE_RESEARCH_NOTES.md) for diagnosed original failures, changes, reproduction commands, query coverage, raw archives, deduplication, validation, and limitations.
