@@ -1,0 +1,73 @@
+---
+name: run-collection
+description: Run, monitor and stop review collection with the scraper controller, storing data in an external directory. Use when asked to start/dry-run/check/stop a collection, set up a config, change where data is stored, or run tests and lint.
+---
+
+# Run a collection
+
+Full design notes: [docs/collection-control.md](../../../docs/collection-control.md).
+
+## 1. Create a local config
+
+Copy `configs/example.json` to `configs/local.json` (git-ignored via `configs/local*.json`).
+Paths are resolved relative to the config file, not the shell directory.
+
+- `data_root`: **where all output goes** (raw archives, CSVs, logs, status). Point it at any
+  directory outside the repo, e.g. `/Volumes/Research/DatingAppsNLP/data` or a relative path
+  such as `../../external-data`. It is the directory *containing* project folders; the app
+  list's `project` field picks the subfolder.
+- `apps`: app list JSON (read only, never modified). It can also live in the external directory.
+- `steps`: one store (`apple` or `google`), explicit `app_ids`, `locales` (Google: also `countries`).
+  Apple may set `resume_apple_from` to `"latest"` or an existing archive directory.
+- `refresh_weeks`: default 5200 (skip fresh convenience CSVs).
+
+Unknown top-level keys are rejected.
+
+## 2. Always dry-run first
+
+```sh
+.venv/bin/python scraper.py collect --config configs/local.json --dry-run
+```
+
+Check the printed worker commands and that paths are under the intended `data_root`.
+
+## 3. Collect, monitor, stop
+
+```sh
+.venv/bin/python scraper.py collect --config configs/local.json [--stop-at 2026-10-20T10:30:00+01:00]
+.venv/bin/python scraper.py status --config configs/local.json
+.venv/bin/python scraper.py stop --config configs/local.json
+```
+
+- `collect` runs in the foreground; `--stop-at` takes ISO 8601 with timezone.
+- `stop` is cooperative; `status` shows when the worker has actually exited (`paused`).
+- Run state and logs: `<data_root>/diagnostics/<run>/`; pointer: `<data_root>/controller_status.json`.
+- Don't run the legacy Zoe/Surge launchers at the same time; they don't share the controller locks.
+- Apple only starts once the shared request lock is at least 2 hours old.
+
+## Docker alternative
+
+The `Dockerfile` entrypoint is `python scraper.py`, so the controller works in a container.
+Mount the external data directory and a config whose paths are container paths
+(e.g. `"data_root": "/data"`, `"apps": "/data/apps/zoe.json"`):
+
+```sh
+docker build -t app-reviews-scraper .
+docker run --rm -v /path/to/external-data:/data -v $(pwd)/configs:/app/configs \
+  app-reviews-scraper collect --config configs/local.json --dry-run
+```
+
+Drop `--dry-run` to collect. `stop`/`status` need `docker exec <container> python scraper.py stop --config ...`
+(use `--name`, and `-d` to run detached). The image needs `ps` (installed via `procps`); this
+Docker path is untested.
+
+## 4. Setup, tests, lint
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt pytest ruff
+.venv/bin/python -m pytest -q
+.venv/bin/ruff check .
+```
+
+Tests use temp dirs and dummy workers only; they never hit the stores or write to `data_root`.
+CI (`.github/workflows/ci.yml`) runs the same ruff and pytest checks.

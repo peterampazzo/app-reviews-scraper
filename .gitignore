@@ -29,3 +29,6 @@ data/apps/*
 !data/apps/zoe.json
 !data/apps/surge.json
 .runtime/
+
+configs/local*.json
+.venv-tools/

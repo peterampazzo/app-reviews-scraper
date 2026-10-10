@@ -2,6 +2,10 @@
 
 Script for scraping app details, reviews and similar apps from the Apple App Store or Google Play Store.
 
+For the opt-in shared collection controller, configuration examples, and graceful
+stop/status commands, see [collection control](docs/collection-control.md).
+The original command-line interface below remains supported.
+
 ## Installation 
 
 ### Locally

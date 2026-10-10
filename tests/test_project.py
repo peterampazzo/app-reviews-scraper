@@ -8,7 +8,6 @@ from unittest.mock import patch
 from scraper_backend.storage import write_bytes, save_review_csv, StorageBudgetExceeded
 from scraper_backend.clients import GoogleClient
 import requests
-import json
 from dating_project import summary, make_plans, write_csv, atomic_json
 
 

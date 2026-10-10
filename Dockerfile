@@ -1,7 +1,7 @@
 # For more information, please refer to https://aka.ms/vscode-docker-python
-FROM python:3.10-slim
+FROM python:3.9-slim
 RUN apt-get update
-RUN apt-get install git -y
+RUN apt-get install -y git procps
 
 # Keeps Python from generating .pyc files in the container
 ENV PYTHONDONTWRITEBYTECODE=1

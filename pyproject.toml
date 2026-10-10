@@ -1,0 +1,22 @@
+[tool.ruff]
+target-version = "py39"
+extend-exclude = [".venv", ".venv-tools", "data", "diagnostics"]
+
+[tool.ruff.lint]
+# Correctness only (syntax errors, undefined names, unused imports/variables).
+select = ["E9", "F"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.tox]
+requires = ["tox>=4.22"]
+env_list = ["lint", "py39"]
+
+[tool.tox.env_run_base]
+deps = ["-r requirements.txt", "pytest"]
+commands = [["pytest", "-q"]]
+
+[tool.tox.env.lint]
+deps = ["ruff"]
+commands = [["ruff", "check", "."]]

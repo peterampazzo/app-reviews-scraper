@@ -1,4 +1,4 @@
-# Tested with Python 3.9.6. python_version was mistakenly a package requirement.
+# Tested with Python 3.9.6; the Docker image and CI also use 3.9. python_version was mistakenly a package requirement.
 pandas==2.3.3
 app-store-scraper @ git+https://github.com/peterampazzo/app-store-scraper.git@7d2fa3dc544404c8182ba6aad5e403a1f1476b01
 google-play-scraper==1.2.7

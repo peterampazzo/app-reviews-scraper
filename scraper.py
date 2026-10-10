@@ -1,19 +1,22 @@
 """Script for scraping app stores"""
 
+# Control commands need no store clients and must not initialize collection.
+import sys
+if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] in ('collect', 'status', 'stop'):
+    from scraper_backend.collection import main
+    raise SystemExit(main())
+
 import argparse
 import json
-import os
 from pathlib import Path
 from datetime import datetime, timezone
 from uuid import uuid4
-import itertools
 import logging
 import os.path as op
 import sys
 import time
 
 import enlighten
-import pandas as pd
 import schedule
 from pyhocon import ConfigFactory
 
