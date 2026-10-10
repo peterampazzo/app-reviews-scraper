@@ -16,7 +16,7 @@ not proof that an app will remain permanently unavailable. Existing raw archives
 Offset-based pagination can shift as reviews are posted/edited; a resumed run is not a
 transactional snapshot. All earlier observations remain part of the combined raw dataset.
 
-Surge is a separate project under `data/surge/`, with Google ID `com.lavendrapp.lavendr`
+Surge is a separate project under `$DATA_ROOT/surge/`, with Google ID `com.lavendrapp.lavendr`
 and Apple ID `709551897`. Both were checked against the stores and identified as Surge;
 Apple returned the same bundle ID. It uses the same 175 Apple storefronts and 84 Google
 language queries, plus GB English queries. Google completed successfully for Zoe and is
@@ -25,12 +25,12 @@ not rerun as part of the Apple retry.
 Launch the three independently logged jobs with:
 
 ```sh
-.venv/bin/python -u continue_collection.py zoe-retry
-.venv/bin/python -u continue_collection.py surge-apple
-.venv/bin/python -u continue_collection.py surge-google
+.venv/bin/python -u continue_collection.py zoe-retry --data-root "$DATA_ROOT"
+.venv/bin/python -u continue_collection.py surge-apple --data-root "$DATA_ROOT"
+.venv/bin/python -u continue_collection.py surge-google --data-root "$DATA_ROOT"
 ```
 
-Each job creates `diagnostics/<timestamp>-<job>/status.json` and `scraper-1.log` (plus a
+Each job creates `$DATA_ROOT/diagnostics/<timestamp>-<job>/status.json` and `scraper-1.log` (plus a
 second Google log for the GB queries). The retry plan is saved in the Zoe job directory.
 These commands perform one collection pass; they are not recurring schedules. Each job
 automatically rebuilds its project's research CSVs after finishing. Avoid launching a
@@ -51,7 +51,7 @@ English plus the local-language choices explicitly recorded in the script and jo
 storefronts, not a claim to cover every country or every language in those countries.
 
 ```sh
-.venv/bin/python -u expand_google_storefronts.py
+.venv/bin/python -u expand_google_storefronts.py --data-root "$DATA_ROOT"
 ```
 
 The job runs one Google query sequence at a time with three-second pacing and full
@@ -71,14 +71,14 @@ Run from this repository directory, using Python 3.9 or later (tested: Python 3.
 ```sh
 python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements-lock.txt
-.venv/bin/python scraper.py --list data/apps/zoe.json --store apple --reviews --review-count -1 --refresh 0
-.venv/bin/python scraper.py --list data/apps/zoe.json --store google --reviews --review-count -1 --refresh 0
-.venv/bin/python scraper.py --list data/apps/zoe.json --store google --reviews --review-count -1 --refresh 0 --countries gb --locales en en_GB
-.venv/bin/python prepare_dataset.py
+.venv/bin/python scraper.py --list research/datingapps/configs/zoe.json --store apple --reviews --review-count -1 --refresh 0 --data-root "$DATA_ROOT"
+.venv/bin/python scraper.py --list research/datingapps/configs/zoe.json --store google --reviews --review-count -1 --refresh 0 --data-root "$DATA_ROOT"
+.venv/bin/python scraper.py --list research/datingapps/configs/zoe.json --store google --reviews --review-count -1 --refresh 0 --countries gb --locales en en_GB --data-root "$DATA_ROOT"
+.venv/bin/python prepare_dataset.py --root "$DATA_ROOT/zoe" --output "$DATA_ROOT/zoe/research"
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-The supplied `data/apps/zoe.json` uses exactly the documented string-ID input schema.
+The supplied research app list uses exactly the documented string-ID input schema.
 `--review-count -1` means no user-imposed total limit. `--refresh 0` deliberately
 requeries existing locale CSVs. Each invocation makes a new immutable raw run folder;
 previous raw files are never overwritten. Locale CSVs are convenience exports and may

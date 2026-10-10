@@ -12,10 +12,11 @@ Full design notes: [docs/collection-control.md](../../../docs/collection-control
 Copy `configs/example.json` to `configs/local.json` (git-ignored via `configs/local*.json`).
 Paths are resolved relative to the config file, not the shell directory.
 
-- `data_root`: **where all output goes** (raw archives, CSVs, logs, status). Point it at any
-  directory outside the repo, e.g. `/Volumes/Research/DatingAppsNLP/data` or a relative path
-  such as `../../external-data`. It is the directory *containing* project folders; the app
-  list's `project` field picks the subfolder.
+- `data_root`: optional **where all output goes** (raw archives, CSVs, logs, status).
+  The default is `<OneDrive root>/Cosmic Latte/app-reviews-scraper-data`; set
+  `ONEDRIVE_ROOT` if OneDrive discovery is ambiguous, or set `DATA_ROOT` directly.
+  It is the directory *containing* project folders; the app list's `project` field
+  picks the subfolder. `--data-root` overrides config and environment.
 - `apps`: app list JSON (read only, never modified). It can also live in the external directory.
 - `steps`: one store (`apple` or `google`), explicit `app_ids`, `locales` (Google: also `countries`).
   Apple may set `resume_apple_from` to `"latest"` or an existing archive directory.
@@ -48,12 +49,12 @@ Check the printed worker commands and that paths are under the intended `data_ro
 ## Docker alternative
 
 The `Dockerfile` entrypoint is `python scraper.py`, so the controller works in a container.
-Mount the external data directory and a config whose paths are container paths
-(e.g. `"data_root": "/data"`, `"apps": "/data/apps/zoe.json"`):
+Mount the external data directory and use container paths in the config (for example
+`"data_root": "/data"`). If omitted, set `DATA_ROOT=/data`:
 
 ```sh
 docker build -t app-reviews-scraper .
-docker run --rm -v /path/to/external-data:/data -v $(pwd)/configs:/app/configs \
+docker run --rm -v /path/to/OneDrive/Cosmic-Latte-data:/data -v "$(pwd)/configs:/app/configs" \
   app-reviews-scraper collect --config configs/local.json --dry-run
 ```
 

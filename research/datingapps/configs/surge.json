@@ -1,0 +1,9 @@
+{
+  "project": "surge",
+  "apps": [
+    {
+      "android": "com.lavendrapp.lavendr",
+      "ios": {"id": "709551897", "name": "surge-gay-dating-chat"}
+    }
+  ]
+}

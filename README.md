@@ -20,7 +20,7 @@ To run the detect language job make sure to install:
 brew install virtualenv protobuf
 ```
 
-### Docker 
+### Docker image
 
 ```
 docker build -t app-reviews-scraper .
@@ -45,18 +45,53 @@ For full usage, run
 python scraper.py -h 
 ```
 
-### Docker 
+### Data location
 
-When running on Docker, the container needs to be able to access the host filesystem for read/write access. 
-Assuming the JSON input lists are in the `data/` directory, then the output will also go in this same directory (as well as the logfile). This is conveyed using the `-v` flag. 
+Collection output defaults to a dedicated folder under the detected OneDrive sync
+root (`Cosmic Latte/app-reviews-scraper-data`). Set `DATA_ROOT` to override it;
+`ONEDRIVE_ROOT` can select the sync root explicitly. The legacy `DATA_LOCATION`
+variable is supported temporarily when `DATA_ROOT` is unset.
+
+For a regular local run, point the input file at its actual location and optionally
+override the output root:
+
+```sh
+export ONEDRIVE_ROOT="/path/to/OneDrive sync root"
+export DATA_ROOT="$ONEDRIVE_ROOT/Cosmic Latte/app-reviews-scraper-data"
+python scraper.py --list path/to/list.json --store apple --details --similar --reviews
 ```
-docker run -t -v $(pwd)/data:/app/data app-reviews-scraper --list data/apps/example.json --store apple --details --similar --reviews
+
+### Docker run
+
+When running on Docker, mount both the external output folder and the input file.
+The container writes to `/data`; the host OneDrive path is never built into the image.
+
+```
+docker run --rm \
+  -v "$DATA_ROOT:/data" \
+  -v "$(pwd)/path/to/list.json:/inputs/apps.json:ro" \
+  app-reviews-scraper \
+  --list /inputs/apps.json --store apple --details --similar --reviews
 ```
 
 Optional:
 ```
-docker run -t -v $(pwd)/data:/app/data -e HEALTH_CHECK=something -e LOGS_FILE=example app-reviews-scraper --list data/apps/example.json --store apple --details --similar --reviews
+docker run --rm \
+  -v "$DATA_ROOT:/data" \
+  -v "$(pwd)/path/to/list.json:/inputs/apps.json:ro" \
+  -e HEALTH_CHECK=something -e LOGS_FILE=example \
+  app-reviews-scraper --list /inputs/apps.json --store apple --details --similar --reviews
 ```
+
+Migrate an existing repository-local `data/` tree with a read-only preview first:
+
+```sh
+python migrate_data.py
+python migrate_data.py --apply --report "$DATA_ROOT/../app-reviews-scraper-migration.json"
+```
+
+The migration command never deletes or overwrites source files. Existing destination
+files are hash-compared; conflicts are reported and left untouched.
 
 ### Status reporting 
 Status reporting is possible with an account on `www.healthchecks.io`. Set up a project on there, get a URL for pinging, and then assign to the `HEALTH_CHECK` env variable the profile id. 
@@ -77,7 +112,22 @@ The input JSON app lists should be structured as follows:
 }
 ```
 
-## Expected directory structure 
+## Current project layout
+
+```text
+.
+├── scraper.py                 # backwards-compatible CLI
+├── scraper_backend/           # runner, controller, stores, transport and storage
+├── configs/                   # generic examples
+├── research/datingapps/       # project-specific workflows, inputs and analysis
+└── tests/
+
+# Collection outputs are outside the repository by default:
+<OneDrive root>/Cosmic Latte/app-reviews-scraper-data/
+```
+
+The following directory tree is a historical example from an earlier version,
+not the current source layout.
 
 An example of the folder structure.
 
@@ -208,4 +258,5 @@ An example of the folder structure.
 
 ## Zoe research collection (2026 compatibility update)
 
-See [ZOE_RESEARCH_NOTES.md](ZOE_RESEARCH_NOTES.md) for diagnosed original failures, changes, reproduction commands, query coverage, raw archives, deduplication, validation, and limitations.
+Project-specific collection notes and analysis live under
+[research/datingapps/](research/datingapps/), separate from the reusable scraper.

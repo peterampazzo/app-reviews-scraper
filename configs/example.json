@@ -1,13 +1,12 @@
 {
-  "data_root": "../data",
-  "apps": "../data/apps/zoe.json",
+  "apps": "example-apps.json",
   "refresh_weeks": 5200,
   "steps": [
     {
-      "store": "apple",
-      "app_ids": ["1269081011"],
-      "locales": ["us", "gb"],
-      "resume_apple_from": "latest"
+      "store": "google",
+      "app_ids": ["com.example.app"],
+      "locales": ["en"],
+      "countries": ["us"]
     }
   ]
 }

@@ -8,9 +8,15 @@ compatible. No historical launchers have been removed or silently redirected.
 
 Copy `configs/example.json` to a local configuration and edit its paths and explicit
 steps. Paths are resolved relative to the configuration file, independent of the
-shell directory. `data_root` is the directory containing project folders (for example
-DatingAppsNLP/data), not the project folder inside it. The app list's `project` field
-continues to determine the raw output subdirectory. The input file is never edited.
+shell directory. `data_root` is optional; the resolution precedence is CLI
+`--data-root`, config `data_root`, `DATA_ROOT`, legacy `DATA_LOCATION`, then
+`<OneDrive root>/Cosmic Latte/app-reviews-scraper-data`. On macOS, a unique
+`~/Library/CloudStorage/OneDrive-*` root is detected. Set `ONEDRIVE_ROOT` when
+discovery is ambiguous, or `DATA_ROOT` directly. Conflicting `DATA_ROOT` and
+`DATA_LOCATION` values are rejected.
+
+The resolved root is the directory containing project folders; the app list's
+`project` field determines the output subdirectory. The input file is read-only.
 
 Each step selects one store, explicit app IDs and separate locale strings. Google
 steps may specify countries. Apple steps may use `resume_apple_from: "latest"` or
@@ -25,6 +31,7 @@ skips; a skipped CSV is not proof that a historically interrupted query is compl
 
 ```sh
 .venv/bin/python scraper.py collect --config configs/local.json --dry-run
+.venv/bin/python scraper.py collect --config configs/local.json --data-root "$DATA_ROOT" --dry-run
 .venv/bin/python scraper.py collect --config configs/local.json --stop-at 2026-10-20T10:30:00+01:00
 .venv/bin/python scraper.py status --config configs/local.json
 .venv/bin/python scraper.py stop --config configs/local.json
@@ -57,14 +64,22 @@ launchers do not share these locks: do not manually launch them alongside the ne
 controller. Full enforcement across every legacy entry point is a later migration.
 The control commands govern only runs created by this controller.
 
-## Remaining refactoring work
+## Safe migration of existing files
 
-1. Move existing locale-plan generation into configuration and migrate the legacy
-   launchers one at a time, including common locks at every entry point.
-2. Unify Apple resume history and implement verified Google token checkpoints.
-3. Consolidate exports and preserve all observations while deduplicating by ID.
-4. Add incremental summaries after snapshot/export equivalence checks.
-5. Retire duplicated launchers only after matching their selected plans and behavior.
+`migrate_data.py` defaults to a read-only preview from repository `data/` to the
+resolved data root. Review conflicts before copying:
 
-This milestone deliberately avoids archive scans, data migrations, client rewrites,
-and dependency upgrades. Tests use temporary files and local dummy workers only.
+```sh
+python migrate_data.py
+python migrate_data.py --apply --report "$ONEDRIVE_ROOT/Cosmic Latte/app-reviews-scraper-migration.json"
+```
+
+The copy preserves relative paths, verifies hashes, and never overwrites a different
+destination file. It leaves the source tree untouched; cleanup is a separate manual
+decision after checking the report.
+
+## Docker
+
+Mount the OneDrive data directory at `/data`, then set `DATA_ROOT=/data` or include
+`"data_root": "/data"` in the container config. Mount app-list inputs read-only at
+their configured container paths. The host OneDrive path is not built into the image.

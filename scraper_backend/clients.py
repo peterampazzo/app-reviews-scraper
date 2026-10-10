@@ -31,11 +31,11 @@ from .apple_compat import CompatibleAppStore
 import google_play_scraper
 import play_scraper
 import requests
-from pyhocon import ConfigFactory
+from .config import load_app_config
 
 from .constants import PLAY_STORE_COUNTRY
 
-config = ConfigFactory.parse_file("app.conf")
+config = load_app_config()
 
 
 class GoogleClient:

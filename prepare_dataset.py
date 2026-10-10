@@ -101,7 +101,7 @@ def statistics(rows):
     return stats
 
 
-def write_report(output, summary, unique, coverage, project='zoe'):
+def write_report(output, summary, unique, coverage, project):
     lines = [f'# {project.title()} collection results', '', 'Generated: ' + summary['generated_at'], '',
              'These counts describe the archived observations available at generation time. '
              'See `query_coverage_final.csv` for completed, failed and unattempted queries.', '',
@@ -144,9 +144,8 @@ def write_report(output, summary, unique, coverage, project='zoe'):
         for r in samples:
             excerpt = ' '.join((r.get('review') or '').split())[:160].replace('|','\\|')
             lines.append(f"| {platform} | {r['review_id']} | {r['review_date']} | {r['rating']} | {r['query_country']} / {r['query_language']} | {excerpt} |")
-    lines += ['', 'Full methods, dependency changes, reproduction commands and deduplication rules: '
-              '`../../../ZOE_RESEARCH_NOTES.md`. Raw observations and source paths allow every selected '
-              'row and every deduplication decision to be audited.', '']
+    lines += ['', 'Raw observations and source paths allow every selected row and every '
+              'deduplication decision to be audited.', '']
     (output/'RESULTS.md').write_text('\n'.join(lines), encoding='utf-8')
 
 
@@ -235,7 +234,9 @@ def build(root, output):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--root', type=Path, default=Path('data/zoe'))
-    parser.add_argument('--output', type=Path, default=Path('data/zoe/research'))
+    parser.add_argument('--root', type=Path, required=True,
+                        help='project data directory containing raw collection archives')
+    parser.add_argument('--output', type=Path, required=True,
+                        help='directory for generated research exports')
     args = parser.parse_args()
     build(args.root, args.output)

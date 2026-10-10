@@ -39,6 +39,18 @@ class ControllerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.config()
 
+    def test_cli_data_root_overrides_config_root(self):
+        self.config()
+        override = self.root / 'override'
+        result = subprocess.run(
+            [sys.executable, 'scraper.py', 'collect', '--config', str(self.config_path),
+             '--data-root', str(override), '--dry-run'],
+            capture_output=True, text=True,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn(str(override), result.stdout)
+        self.assertFalse(override.exists())
+
     def test_unknown_ids_and_google_apple_resume_are_rejected(self):
         self.source['steps'][0]['app_ids'] = ['wrong']
         with self.assertRaises(ValueError):

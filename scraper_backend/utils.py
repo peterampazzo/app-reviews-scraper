@@ -11,10 +11,10 @@ from datetime import datetime, timedelta
 
 import requests
 import schedule
-from pyhocon import ConfigFactory
+from .config import load_app_config
 from .storage import write_bytes
 
-config = ConfigFactory.parse_file("app.conf")
+config = load_app_config()
 
 
 def launch_background_task(interval_secs=10):

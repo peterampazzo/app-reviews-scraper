@@ -24,10 +24,6 @@ diagnostics/
 original-install.log
 !data/
 data/*
-!data/apps/
-data/apps/*
-!data/apps/zoe.json
-!data/apps/surge.json
 .runtime/
 
 configs/local*.json

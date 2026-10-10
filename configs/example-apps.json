@@ -1,0 +1,9 @@
+{
+  "project": "example",
+  "apps": [
+    {
+      "android": "com.example.app",
+      "ios": "123456789"
+    }
+  ]
+}

@@ -14,9 +14,9 @@ COPY requirements.txt .
 RUN python -m pip install -r requirements.txt
 
 WORKDIR /app
+ENV DATA_ROOT=/data
 COPY app.conf /app
 COPY scraper_backend /app/scraper_backend
 COPY scraper.py /app
-
-# ENTRYPOINT ["ls", "data/apps/"]
+COPY migrate_data.py /app
 ENTRYPOINT ["python", "scraper.py"]

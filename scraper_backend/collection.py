@@ -15,6 +15,8 @@ import sys
 import time
 from uuid import uuid4
 
+from .paths import resolve_data_root
+
 BASE = Path(__file__).resolve().parent.parent
 TERMINAL = {'complete', 'failed', 'paused'}
 
@@ -25,14 +27,18 @@ def save(path, value):
     temporary.replace(path)
 
 
-def load_config(path):
+def load_config(path, data_root_override=None):
     path = Path(path).resolve()
     config = json.loads(path.read_text())
     allowed = {'data_root', 'apps', 'steps', 'refresh_weeks'}
     if set(config) - allowed:
         raise ValueError('Unknown configuration fields: ' + ', '.join(set(config) - allowed))
-    for key in ('data_root', 'apps'):
-        config[key] = str((path.parent / config[key]).resolve())
+    config['data_root'] = str(resolve_data_root(
+        explicit=data_root_override,
+        configured=config.get('data_root'),
+        base_dir=path.parent,
+    ))
+    config['apps'] = str((path.parent / config['apps']).resolve())
     profile = json.loads(Path(config['apps']).read_text())
     if not profile.get('project') or not profile.get('apps'):
         raise ValueError('App list must contain project and apps')
@@ -72,7 +78,7 @@ def load_config(path):
 def command(config, step):
     args = [sys.executable, '-u', str(BASE / 'scraper.py'), '--list', config['apps'],
             '--store', step['store'], '--reviews', '--details', '--review-count', '-1',
-            '--refresh', str(config['refresh_weeks'])]
+            '--refresh', str(config['refresh_weeks']), '--data-root', config['data_root']]
     for key in ('app_ids', 'locales', 'countries'):
         if key in step:
             args += ['--' + key.replace('_', '-')] + step[key]
@@ -150,7 +156,8 @@ def supervise(config, stop_at=None):
                         time.sleep(1)
                     if requested():
                         break
-                env = dict(os.environ, DATA_LOCATION=str(root) + '/', DATA_BUDGET_ROOT=str(root),
+                env = dict(os.environ, DATA_ROOT=str(root), DATA_LOCATION=str(root) + '/',
+                           DATA_BUDGET_ROOT=str(root),
                            DATA_BUDGET_BYTES='0', APPLE_SLEEP='10',
                            LOGS_FILE=str(job / ('worker-%d-internal' % index)))
                 args = command(config, step)
@@ -192,11 +199,12 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=['collect', 'status', 'stop'])
     parser.add_argument('--config', required=True)
+    parser.add_argument('--data-root', help='collection data directory (overrides config and environment)')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--stop-at', help='ISO 8601 timestamp with explicit timezone')
     args = parser.parse_args(argv)
     try:
-        config = load_config(args.config)
+        config = load_config(args.config, data_root_override=args.data_root)
         deadline = None
         if args.stop_at:
             date = datetime.fromisoformat(args.stop_at)
