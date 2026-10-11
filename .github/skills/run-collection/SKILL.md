@@ -5,7 +5,16 @@ description: Run, monitor and stop review collection with the scraper controller
 
 # Run a collection
 
-Full design notes: [docs/collection-control.md](../../../docs/collection-control.md).
+For the user-facing quickstart and workflow choice, read
+[README.md](../../../README.md). Full controller behavior is in
+[docs/collection-control.md](../../../docs/collection-control.md).
+
+Use the shared controller for new generic runs. Do not substitute the direct
+scraper CLI or research launchers: they do not provide the controller's shared
+status/stop behavior. The checked-in example app ID is a placeholder, and the
+controller requests all reviews for every selected query. Keep initial plans
+narrow. A bounded live smoke test can use the direct CLI with `--review-count`,
+but it makes a real store request and is not a controller-managed run.
 
 ## 1. Create a local config
 
@@ -31,6 +40,8 @@ Unknown top-level keys are rejected.
 ```
 
 Check the printed worker commands and that paths are under the intended `data_root`.
+Dry-run validates configuration and prints commands only; it makes no store
+requests and creates no collection output. It does not verify store availability.
 
 ## 3. Collect, monitor, stop
 
@@ -65,10 +76,20 @@ Docker path is untested.
 ## 4. Setup, tests, lint
 
 ```sh
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt pytest ruff
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt pytest ruff
 .venv/bin/python -m pytest -q
 .venv/bin/ruff check .
 ```
 
 Tests use temp dirs and dummy workers only; they never hit the stores or write to `data_root`.
-CI (`.github/workflows/ci.yml`) runs the same ruff and pytest checks.
+CI installs `requirements.txt`, runs pytest, and runs Ruff. The project-specific
+reproduction notes may use `requirements-lock.txt`; that lockfile is not needed for
+the generic controller quickstart.
+
+## Data migration safety
+
+`migrate_data.py` is separate from collection. Its default preview hashes every
+source file, does not copy or delete data, and may take a long time for a large or
+cloud-synced source tree. Only add `--apply` after reviewing the preview. The source
+tree is retained.

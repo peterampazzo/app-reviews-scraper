@@ -1,4 +1,11 @@
-# Zoe review collection
+# Zoe review collection: project reproduction notes
+
+These notes preserve the project-specific collection plan, run history and
+reproduction commands. They are not the generic scraper setup guide. For current
+generic installation and controller instructions, see the repository
+[README](../../README.md) and [controller guide](../../docs/collection-control.md).
+Commands below can contact app stores and write research data; review their scope
+and `DATA_ROOT` before running.
 
 This reuses https://github.com/peterampazzo/app-reviews-scraper at commit
 `fce1a897c52426a5615802e5a654fb0c9b9b8930`. Collection began 2 October 2026.

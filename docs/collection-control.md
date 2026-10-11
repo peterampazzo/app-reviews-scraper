@@ -1,8 +1,10 @@
-# Collection control: first refactoring milestone
+# Collection controller guide
 
-The source checkpoint is `b6d7a52`. The new controller is opt-in; no collection is
-started by installing or testing it. Existing scraper arguments and archives remain
-compatible. No historical launchers have been removed or silently redirected.
+Use this guide for new controller-managed collections. The root
+[README](../README.md) is the quickstart; this page documents controller
+configuration, behavior and operational details. The legacy direct scraper CLI
+and project-specific research launchers remain available, but do not provide the
+controller's shared status/stop behavior.
 
 ## Configuration
 
@@ -24,10 +26,21 @@ an existing archive directory. Resume semantics are unchanged; this milestone do
 not fix ancestry reconstruction or add Google continuation-token resume. Steps run
 sequentially and a worker failure ends the controller run for inspection.
 
-The example is illustrative, not the agreed next collection plan. In particular,
-`latest` remains the existing scraper's largest-offset selection. Review the dry-run
-before launching. `refresh_weeks` defaults to 5200, preserving fresh convenience CSV
-skips; a skipped CSV is not proof that a historically interrupted query is complete.
+The checked-in example app ID is a placeholder and cannot be used for collection.
+Choose a real app-list file and IDs. In particular, `latest` remains the existing
+scraper's largest-offset selection. Review the dry-run before launching.
+`refresh_weeks` defaults to 5200, preserving fresh convenience CSV skips; a skipped
+CSV is not proof that a historically interrupted query is complete.
+
+The controller always requests all reviews (`--review-count -1`) for each selected
+query; it has no per-step review-count limit. Keep the number of selected apps and
+queries deliberately small when starting. For a bounded live smoke test, use the
+direct scraper CLI with `--review-count`; see the README. That command contacts the
+store and does not create controller run state.
+
+`--dry-run` validates the config and prints worker commands. It makes no store
+requests and creates no collection output. It does not prove that the store will
+return results or that a worker can complete successfully.
 
 ```sh
 .venv/bin/python scraper.py collect --config configs/local.json --dry-run
@@ -67,16 +80,19 @@ The control commands govern only runs created by this controller.
 ## Safe migration of existing files
 
 `migrate_data.py` defaults to a read-only preview from repository `data/` to the
-resolved data root. Review conflicts before copying:
+resolved data root. The preview reads and hashes every source file; a large tree,
+especially one on a cloud-synced volume, can take a long time. It does not copy or
+delete collection data. Use `--report` to persist the complete per-file report, and
+review conflicts before copying:
 
 ```sh
 python migrate_data.py
 python migrate_data.py --apply --report "$ONEDRIVE_ROOT/Cosmic Latte/app-reviews-scraper-migration.json"
 ```
 
-The copy preserves relative paths, verifies hashes, and never overwrites a different
-destination file. It leaves the source tree untouched; cleanup is a separate manual
-decision after checking the report.
+Only `--apply` copies files. The copy preserves relative paths, verifies hashes, and
+never overwrites a different destination file. It leaves the source tree untouched;
+cleanup is a separate manual decision after checking the report.
 
 ## Docker
 
